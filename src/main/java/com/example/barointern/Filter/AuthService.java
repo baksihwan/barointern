@@ -4,12 +4,13 @@ import com.example.barointern.Domain.Repository.MemberRepository;
 import com.example.barointern.Entity.Member;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class AuthService {
+public class AuthService implements UserDetailsService {
 
     private final MemberRepository memberRepository;
 
@@ -22,4 +23,4 @@ public class AuthService {
 }
 
 
-}
+
