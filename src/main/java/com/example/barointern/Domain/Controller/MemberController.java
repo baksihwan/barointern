@@ -4,15 +4,15 @@ import com.example.barointern.Domain.Dto.LoginResponseDto;
 import com.example.barointern.Domain.Dto.SignUpRequestDto;
 import com.example.barointern.Domain.Repository.MemberRepository;
 import com.example.barointern.Domain.Service.MemberService;
+import com.example.barointern.Entity.Member;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.*;
 
 
 @RestController
@@ -32,5 +32,14 @@ public class MemberController {
                                                                 requestDto.getPassword(),
                                                                 requestDto.getNickname());
         return ResponseEntity.ok(loginResponseDto);
+    }
+
+    @GetMapping("/login")
+    @SecurityRequirement(name = "Authorization") //해당 API에 인증 적용
+    @Operation(summary = "로그인", description = "JWT 인증된 사용자의 정보를 반환합니다.")
+    public ResponseEntity<Member> login(@AuthenticationPrincipal UserDetails userDetails) {
+        String username = userDetails.getUsername();
+        Member member = memberRepository.findByUsername(username);
+        return ResponseEntity.ok(member);
     }
 }
