@@ -1,4 +1,12 @@
 package com.example.barointern.Filter;
 
-public class CustomUserDetails {
+import com.example.barointern.Entity.Member;
+
+public class CustomUserDetails implements UserDetails{
+
+    private final Member member;
+
+    public CustomUserDetails(Member member) {
+        this.member = member;
+    }
 }
