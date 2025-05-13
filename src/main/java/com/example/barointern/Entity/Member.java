@@ -33,3 +33,5 @@ public class Member {
         this.username = username;
         this.password = password;
         this.nickname = nickname;
+    }
+}
