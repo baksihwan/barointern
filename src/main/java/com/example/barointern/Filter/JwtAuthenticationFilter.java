@@ -16,13 +16,18 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
-@RequiredArgsConstructor
+
 @Slf4j
 // JWT 토큰을 검사해서, 로그인 없이 인증해 주는 필터
-public class JwtAuthenticationFIlter extends OncePerRequestFilter {
+public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final UserDetailsService authService;
     private final JwtTokenService jwtTokenService;
+
+    public JwtAuthenticationFilter(UserDetailsService authService, JwtTokenService jwtTokenService) {
+        this.authService = authService;
+        this.jwtTokenService = jwtTokenService;
+    }
 
     public String getUsername(String token){
         return token.substring(7);
