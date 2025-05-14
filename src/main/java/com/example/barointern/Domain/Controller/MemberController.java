@@ -44,7 +44,7 @@ public class MemberController {
         return ResponseEntity.ok(member);
     }
 
-    @GetMapping("/admin/login")
+    @GetMapping("/admin/users/{userId}/role")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> admin(){
         return ResponseEntity.ok("관리자 전용입니다.");

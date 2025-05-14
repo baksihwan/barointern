@@ -55,7 +55,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             Authentication auth = jwtTokenService.getAuthentication(token); //Authenticaton 객체
             SecurityContextHolder.getContext().setAuthentication(auth); // SecurityContext에 로드
         } else {
-            log.info("토큰 유효성 검증을 실패하였습니다.");
+            log.info("유효하지 않은 인증 토큰입니다.");
         }
         filterChain.doFilter(request, response);
     }
