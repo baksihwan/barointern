@@ -12,5 +12,5 @@ JAVA(Spring boot)를 이용해서 로그인 기능을 구현합니다.
 
 ##### 4. 애플리케이션을 AWS EC2에 배포
 
-##Swagger UI주소
+### Swagger UI주소
 http://localhost:8080/swagger-ui/index.html
