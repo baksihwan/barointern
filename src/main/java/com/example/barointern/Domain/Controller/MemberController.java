@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("0.0.0.0:8080")
+@RequestMapping
 @Tag(name = "회원 API", description = "회원 관련 API입니다.")
 public class MemberController {
 
@@ -30,8 +30,8 @@ public class MemberController {
     @Operation(summary = "회원가입", description = "회원가입을 처리합니다.")
     public ResponseEntity<LoginResponseDto> signup(@RequestBody SignUpRequestDto requestDto){
         LoginResponseDto loginResponseDto = memberService.signup(requestDto.getUsername(),
-                                                                requestDto.getPassword(),
-                                                                requestDto.getNickname());
+                requestDto.getPassword(),
+                requestDto.getNickname());
         return ResponseEntity.ok(loginResponseDto);
     }
 

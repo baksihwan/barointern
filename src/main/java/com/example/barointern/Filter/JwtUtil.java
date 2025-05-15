@@ -38,15 +38,20 @@ public class JwtUtil {
                 .parseClaimsJws(token)
                 .getBody();
     }
+
     //유효성 검사
-    public boolean validateToken(String token){
+    public boolean validateToken(String token) {
         try {
-            Claims claims = getClaims(token);
+            Claims claims = Jwts.parser()
+                    .setSigningKey(secretKey)
+                    .parseClaimsJws(token)
+                    .getBody();
             return !claims.getExpiration().before(new Date());
         } catch (Exception e) {
             return false;
         }
     }
+
     public String getUsername(String token){
         return getClaims(token).getSubject();
     }

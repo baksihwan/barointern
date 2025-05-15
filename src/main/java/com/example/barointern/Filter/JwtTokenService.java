@@ -51,10 +51,6 @@ public class JwtTokenService {
         return null;
     }
 
-    public boolean validateToken(String token) {
-        return token != null && token.startsWith(TOKEN_PREFIX);
-    }
-
     public boolean isAccessTokenDenied(String token) {
         return token != null && token.startsWith(TOKEN_HEADER);
     }
@@ -69,5 +65,9 @@ public class JwtTokenService {
                 null,
                 userDetails.getAuthorities()
         );
+    }
+
+    public boolean validateToken(String token) {
+        return jwtUtil.validateToken(token);
     }
 }

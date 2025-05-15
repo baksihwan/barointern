@@ -4,7 +4,6 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -39,25 +38,23 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         Authentication auth  = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(auth);
 
-    return auth;}
+        return auth;}
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
 
-        //토큰 파싱
         String token = jwtTokenService.resolveTokenFromRequest(request.getHeader("Authorization"));
 
-        //토큰 문제 유무 체크
-        if(StringUtils.hasText(token) && jwtTokenService.validateToken(token)
-                && !jwtTokenService.isAccessTokenDenied(token)) {
-            //토큰 유효성 검증시 로직
-            Authentication auth = jwtTokenService.getAuthentication(token); //Authenticaton 객체
-            SecurityContextHolder.getContext().setAuthentication(auth); // SecurityContext에 로드
+        if (StringUtils.hasText(token)
+                && jwtTokenService.validateToken(token)) {
+            Authentication auth = jwtTokenService.getAuthentication(token);
+            SecurityContextHolder.getContext().setAuthentication(auth);
         } else {
             log.info("유효하지 않은 인증 토큰입니다.");
         }
+
         filterChain.doFilter(request, response);
     }
-    }
 
+}
