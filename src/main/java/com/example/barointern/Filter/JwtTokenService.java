@@ -15,7 +15,7 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @Service
-public class JwtTokenService {
+public class JwtTokenService { //인증 권한 부여
 
     private final JwtUtil jwtUtil;
     private final UserDetailsService authService;
@@ -54,8 +54,7 @@ public class JwtTokenService {
     public boolean isAccessTokenDenied(String token) {
         return token != null && token.startsWith(TOKEN_HEADER);
     }
-
-
+    //Jwt 토큰에 들어있는 정보를 꺼내는 메서드
     public Authentication getAuthentication(String token){
         String username = jwtUtil.getUsername(token);
         UserDetails userDetails = authService.loadUserByUsername(username);
@@ -66,7 +65,7 @@ public class JwtTokenService {
                 userDetails.getAuthorities()
         );
     }
-
+    //토큰 정보를 검증하는 메서드
     public boolean validateToken(String token) {
         return jwtUtil.validateToken(token);
     }
