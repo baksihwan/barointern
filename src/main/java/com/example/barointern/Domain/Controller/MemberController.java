@@ -25,7 +25,7 @@ public class MemberController {
     private final MemberService memberService;
     private final MemberRepository memberRepository;
 
-    @PostMapping("/signup")
+    @PostMapping("/auth/signup")
     @SecurityRequirement(name = "Authorization") //Swagger를 위한 보안요건 명시
     @Operation(summary = "회원가입", description = "회원가입을 처리합니다.")
     public ResponseEntity<LoginResponseDto> signup(@RequestBody SignUpRequestDto requestDto){
@@ -35,7 +35,7 @@ public class MemberController {
         return ResponseEntity.ok(loginResponseDto);
     }
 
-    @GetMapping("/login")
+    @GetMapping("/auth/login")
     @SecurityRequirement(name = "Authorization") //Swagger를 위한 보안요건 명시
     @Operation(summary = "로그인", description = "JWT 인증된 사용자의 정보를 반환합니다.")
     public ResponseEntity<Member> login(@AuthenticationPrincipal UserDetails userDetails) {
@@ -43,7 +43,6 @@ public class MemberController {
         Member member = memberRepository.findByUsername(username);
         return ResponseEntity.ok(member);
     }
-
     @GetMapping("/admin/users/{userId}/role")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> admin(){
