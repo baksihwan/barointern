@@ -2,25 +2,31 @@ package com.example.barointern.Filter;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import jakarta.annotation.PostConstruct;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-
+import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Date;
 
 @Component
-//JWT를 생성하고 검증하며, 토큰 안의 정보를 파싱하는 도구 역할
-// 1.토큰 생성  2.토큰 유효성 검증  3.Claims 파싱  4.사용자 정보 추출
+@Slf4j
 public class JwtUtil {
 
-    //비밀 키
-    private final Key secretKey = Keys.secretKeyFor(SignatureAlgorithm.HS256);
+    @Value("${jwt.secret}")
+    private String secret;  // 문자열로 받아옴
 
-    //토큰 유효 시간 (1시간)
-    private final long EXPIRATION_TIME = 60 * 60 * 1000;
+    private Key secretKey;
 
-    //토큰 생성
+    private final long EXPIRATION_TIME = 60 * 300 * 1000; // 5시간
+
+    @PostConstruct
+    public void init() {
+        this.secretKey = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
+    }
+
     public String createToken(String username) {
         return Jwts.builder()
                 .setSubject(username)
@@ -30,8 +36,7 @@ public class JwtUtil {
                 .compact();
     }
 
-    // 내부적으로 Claims 파싱하는 메서드
-    private Claims getClaims(String token){
+    private Claims getClaims(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(secretKey)
                 .build()
@@ -39,20 +44,32 @@ public class JwtUtil {
                 .getBody();
     }
 
-    //유효성 검사
     public boolean validateToken(String token) {
         try {
-            Claims claims = Jwts.parser()
+            Claims claims = Jwts.parserBuilder()
                     .setSigningKey(secretKey)
+                    .build()
                     .parseClaimsJws(token)
                     .getBody();
-            return !claims.getExpiration().before(new Date());
+            return !
+                    claims.getExpiration().before(new Date());
         } catch (Exception e) {
+            log.warn("JWT 검증 실패 : {}", e.getMessage());
             return false;
         }
     }
 
-    public String getUsername(String token){
-        return getClaims(token).getSubject();
+    public String getUsername(String token) {
+        try {
+            Claims claims = Jwts.parserBuilder()
+                    .setSigningKey(secretKey)
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+            return claims.getSubject();
+        } catch (Exception e) {
+            log.warn("JWT에서 username 추출 실패 : {}", e.getMessage());
+        }
+        return null;
     }
 }

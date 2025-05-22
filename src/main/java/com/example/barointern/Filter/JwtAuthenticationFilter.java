@@ -5,10 +5,8 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -28,33 +26,25 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         this.jwtTokenService = jwtTokenService;
     }
 
-    public String getUsername(String token){
-        return token.substring(7);
-    }
-    // 토큰을 바탕으로 SecurityContext에 인증 정보를 심는 작업을 한다.
-    public Authentication getAuthentication(String token){
-        String username = this.getUsername(token);
-        UserDetails userDetails = authService.loadUserByUsername(username);
-        Authentication auth  = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-        SecurityContextHolder.getContext().setAuthentication(auth);
-
-        return auth;}
-
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
 
         String token = jwtTokenService.resolveTokenFromRequest(request.getHeader("Authorization"));
 
-        if (StringUtils.hasText(token)
-                && jwtTokenService.validateToken(token)) {
-            Authentication auth = jwtTokenService.getAuthentication(token);
-            SecurityContextHolder.getContext().setAuthentication(auth);
-        } else {
+        if (!StringUtils.hasText(token) || !jwtTokenService.validateToken(token)) {
             log.info("유효하지 않은 인증 토큰입니다.");
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401 상태 코드 설정
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+            response.getWriter().write("{\"message\": \"유효하지 않은 인증 토큰입니다.\"}");
+            return;
         }
+
+        // 토큰이 유효하다면 다음 필터로 요청을 전달
+        Authentication authentication = jwtTokenService.getAuthentication(token);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
 
         filterChain.doFilter(request, response);
     }
-
 }
